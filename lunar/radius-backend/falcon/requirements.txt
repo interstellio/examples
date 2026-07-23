@@ -1,0 +1,7 @@
+# Example RADIUS backend (Falcon).
+# falcon - the web framework serving the lunar backend API.
+# cryptography - DES primitive used by the MS-CHAP / MS-CHAPv2 helpers.
+# gunicorn - production WSGI server used by run.py for a fast, concurrent demo.
+falcon>=3.1
+cryptography>=3.4
+gunicorn>=21.2

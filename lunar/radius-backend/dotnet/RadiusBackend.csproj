@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!--
+    Example RADIUS backend for lunar, built with ASP.NET Core minimal APIs.
+
+    Microsoft.NET.Sdk.Web gives us the minimal-API host (Kestrel) with no extra
+    packages. The MS-CHAP crypto (MD4, DES) is implemented in Auth/Nt.cs using
+    only the base class library, so this example has ZERO NuGet dependencies -
+    `dotnet run` is all you need.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>RadiusBackend</RootNamespace>
+    <AssemblyName>radius-backend</AssemblyName>
+    <!-- The demo only ever handles ASCII user names; invariant globalization
+         keeps the published binary small and startup fast. -->
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,3 @@
+# Node.js build/runtime artifacts - restored by `npm install`.
+node_modules/
+npm-debug.log*

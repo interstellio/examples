@@ -1,0 +1,9 @@
+# Example RADIUS backend (async Falcon / ASGI).
+# falcon - the web framework serving the lunar backend API.
+# cryptography - DES primitive used by the MS-CHAP / MS-CHAPv2 helpers.
+# uvicorn - production ASGI server used by run.py for a fast, concurrent demo.
+# uvloop - a faster event loop that uvicorn uses automatically when installed.
+falcon>=3.1
+cryptography>=3.4
+uvicorn>=0.29
+uvloop>=0.19
