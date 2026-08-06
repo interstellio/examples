@@ -4,13 +4,13 @@
  *
  * Endpoints (see docs/subscriber/radius/api.rst):
  *
- *   GET  /v1/lunar/{server_id}/virtuals            -> [ TEST virtual ]
- *   GET  /v1/lunar/{server_id}/virtual/{id}        -> TEST virtual
- *   POST /v1/lunar/{server_id}/auth/{virtual_id}   -> access-accept / reject
- *   POST /v1/lunar/{server_id}/acct/{virtual_id}   -> accounting-response
- *   POST /v1/lunar/{server_id}/coa/{virtual_id}    -> coa-ack / disconnect-ack
- *   POST /v1/lunar/{server_id}/log                 -> 201 (accept + log)
- *   GET  /v1/lunar/ping                            -> 200 (health probe)
+ *   GET  /v1/lunar/radius/{server_id}/virtuals            -> [ TEST virtual ]
+ *   GET  /v1/lunar/radius/{server_id}/virtual/{id}        -> TEST virtual
+ *   POST /v1/lunar/radius/{server_id}/auth/{virtual_id}   -> access-accept / reject
+ *   POST /v1/lunar/radius/{server_id}/acct/{virtual_id}   -> accounting-response
+ *   POST /v1/lunar/radius/{server_id}/coa/{virtual_id}    -> coa-ack / disconnect-ack
+ *   POST /v1/lunar/radius/{server_id}/log                 -> 201 (accept + log)
+ *   GET  /v1/lunar/radius/ping                            -> 200 (health probe)
  */
 package io.interstellio.radius;
 
@@ -254,14 +254,14 @@ public class BackendController {
 
     // --- endpoints -----------------------------------------------------------
 
-    /** GET /v1/lunar/{server_id}/virtuals - list virtuals for a server. */
-    @GetMapping(value = "/v1/lunar/{serverId}/virtuals", produces = MediaType.APPLICATION_JSON_VALUE)
+    /** GET /v1/lunar/radius/{server_id}/virtuals - list virtuals for a server. */
+    @GetMapping(value = "/v1/lunar/radius/{serverId}/virtuals", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Map<String, Object>> virtuals(@PathVariable String serverId) {
         return List.of(testVirtual());
     }
 
-    /** GET /v1/lunar/{server_id}/virtual/{virtual_id} - one virtual by id. */
-    @GetMapping(value = "/v1/lunar/{serverId}/virtual/{virtualId}",
+    /** GET /v1/lunar/radius/{server_id}/virtual/{virtual_id} - one virtual by id. */
+    @GetMapping(value = "/v1/lunar/radius/{serverId}/virtual/{virtualId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, Object> virtual(@PathVariable String serverId,
             @PathVariable String virtualId) {
@@ -269,14 +269,14 @@ public class BackendController {
     }
 
     /**
-     * POST /v1/lunar/{server_id}/auth/{virtual_id} - an Access-Request.
+     * POST /v1/lunar/radius/{server_id}/auth/{virtual_id} - an Access-Request.
      *
      * Answering a request happens in four steps, numbered below: (1) read the
      * forwarded packet, (2) find the user name, (3) detect the credential
      * method and verify it to build the reply, (4) answer lunar and log it.
      * Each method has its own block so it is obvious what happens for it.
      */
-    @PostMapping(value = "/v1/lunar/{serverId}/auth/{virtualId}",
+    @PostMapping(value = "/v1/lunar/radius/{serverId}/auth/{virtualId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, Object> auth(@PathVariable String serverId, @PathVariable String virtualId,
             @RequestBody(required = false) String body,
@@ -358,10 +358,10 @@ public class BackendController {
     }
 
     /**
-     * POST /v1/lunar/{server_id}/acct/{virtual_id} - an Accounting-Request.
+     * POST /v1/lunar/radius/{server_id}/acct/{virtual_id} - an Accounting-Request.
      * lunar fast-ACKs accounting to the NAS itself, so we just acknowledge it.
      */
-    @PostMapping(value = "/v1/lunar/{serverId}/acct/{virtualId}",
+    @PostMapping(value = "/v1/lunar/radius/{serverId}/acct/{virtualId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, Object> acct(@PathVariable String serverId, @PathVariable String virtualId,
             @RequestBody(required = false) String body,
@@ -373,10 +373,10 @@ public class BackendController {
     }
 
     /**
-     * POST /v1/lunar/{server_id}/coa/{virtual_id} - CoA / Disconnect.
+     * POST /v1/lunar/radius/{server_id}/coa/{virtual_id} - CoA / Disconnect.
      * Acknowledge with the reply that matches the request.
      */
-    @PostMapping(value = "/v1/lunar/{serverId}/coa/{virtualId}",
+    @PostMapping(value = "/v1/lunar/radius/{serverId}/coa/{virtualId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, Object> coa(@PathVariable String serverId, @PathVariable String virtualId,
             @RequestBody(required = false) String body,
@@ -392,8 +392,8 @@ public class BackendController {
         return reply;
     }
 
-    /** POST /v1/lunar/{server_id}/log - remote log lines (accepted). */
-    @PostMapping("/v1/lunar/{serverId}/log")
+    /** POST /v1/lunar/radius/{server_id}/log - remote log lines (accepted). */
+    @PostMapping("/v1/lunar/radius/{serverId}/log")
     public ResponseEntity<Void> remoteLog(@PathVariable String serverId,
             @RequestBody(required = false) String body) {
         // lunar ships its subscriber log lines here as a JSON object; print
@@ -427,8 +427,8 @@ public class BackendController {
         return ResponseEntity.status(201).build();
     }
 
-    /** GET /v1/lunar/ping - the health probe lunar's /v1/status hits. */
-    @GetMapping("/v1/lunar/ping")
+    /** GET /v1/lunar/radius/ping - the health probe lunar's /v1/status hits. */
+    @GetMapping("/v1/lunar/radius/ping")
     public ResponseEntity<Void> ping() {
         return ResponseEntity.ok().build();
     }

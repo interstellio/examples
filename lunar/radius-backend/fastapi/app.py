@@ -15,13 +15,13 @@ Accounting and CoA are acknowledged; the log and health endpoints are accepted.
 
 Endpoints (see ``docs/subscriber/radius/api.rst``):
 
-    GET  /v1/lunar/{server_id}/virtuals            -> [ TEST virtual ]
-    GET  /v1/lunar/{server_id}/virtual/{id}        -> TEST virtual
-    POST /v1/lunar/{server_id}/auth/{virtual_id}   -> access-accept / reject
-    POST /v1/lunar/{server_id}/acct/{virtual_id}   -> accounting-response
-    POST /v1/lunar/{server_id}/coa/{virtual_id}    -> coa-ack / disconnect-ack
-    POST /v1/lunar/{server_id}/log                 -> 201 (accept + log)
-    GET  /v1/lunar/ping                            -> 200 (health probe)
+    GET  /v1/lunar/radius/{server_id}/virtuals          -> [ TEST virtual ]
+    GET  /v1/lunar/radius/{server_id}/virtual/{id}      -> TEST virtual
+    POST /v1/lunar/radius/{server_id}/auth/{virtual_id} -> accept / reject
+    POST /v1/lunar/radius/{server_id}/acct/{virtual_id} -> accounting-response
+    POST /v1/lunar/radius/{server_id}/coa/{virtual_id}  -> coa/disconnect-ack
+    POST /v1/lunar/radius/{server_id}/log               -> 201 (accept + log)
+    GET  /v1/lunar/radius/ping                          -> 200 (health probe)
 
 Run it (from this directory) with ``python app.py`` and it listens on
 127.0.0.1:5555. See README.rst for the full walk-through.
@@ -123,23 +123,23 @@ def log_exchange(kind, server_id, virtual_id, client_ip, request, reply):
     )
 
 
-@application.get("/v1/lunar/{server_id}/virtuals")
+@application.get("/v1/lunar/radius/{server_id}/virtuals")
 async def virtuals(server_id: str):
-    """GET /v1/lunar/{server_id}/virtuals - list virtuals for a server."""
+    """GET /v1/lunar/radius/{server_id}/virtuals - virtuals for a server."""
     return Response(content=json.dumps([TEST_VIRTUAL]),
                     media_type="application/json")
 
 
-@application.get("/v1/lunar/{server_id}/virtual/{virtual_id}")
+@application.get("/v1/lunar/radius/{server_id}/virtual/{virtual_id}")
 async def virtual(server_id: str, virtual_id: str):
-    """GET /v1/lunar/{server_id}/virtual/{virtual_id} - one virtual by id."""
+    """GET /v1/lunar/radius/{server_id}/virtual/{virtual_id} - one virtual."""
     return Response(content=json.dumps(TEST_VIRTUAL),
                     media_type="application/json")
 
 
-@application.post("/v1/lunar/{server_id}/auth/{virtual_id}")
+@application.post("/v1/lunar/radius/{server_id}/auth/{virtual_id}")
 async def auth(server_id: str, virtual_id: str, request: Request):
-    """POST /v1/lunar/{server_id}/auth/{virtual_id} - an Access-Request.
+    """POST /v1/lunar/radius/{server_id}/auth/{virtual_id} - an Access-Request.
 
     Answering a request happens in four steps, numbered below: (1) read the
     forwarded packet, (2) find the user name, (3) detect the credential method
@@ -317,9 +317,9 @@ async def auth(server_id: str, virtual_id: str, request: Request):
                     media_type="application/json")
 
 
-@application.post("/v1/lunar/{server_id}/acct/{virtual_id}")
+@application.post("/v1/lunar/radius/{server_id}/acct/{virtual_id}")
 async def acct(server_id: str, virtual_id: str, request: Request):
-    """POST /v1/lunar/{server_id}/acct/{virtual_id} - an Accounting-Request.
+    """POST /v1/lunar/radius/{server_id}/acct/{virtual_id} - an acct request.
 
     lunar fast-ACKs accounting to the NAS itself, so we just acknowledge it.
     """
@@ -334,9 +334,9 @@ async def acct(server_id: str, virtual_id: str, request: Request):
                     media_type="application/json")
 
 
-@application.post("/v1/lunar/{server_id}/coa/{virtual_id}")
+@application.post("/v1/lunar/radius/{server_id}/coa/{virtual_id}")
 async def coa(server_id: str, virtual_id: str, request: Request):
-    """POST /v1/lunar/{server_id}/coa/{virtual_id} - CoA / Disconnect.
+    """POST /v1/lunar/radius/{server_id}/coa/{virtual_id} - CoA / Disconnect.
 
     Acknowledge with the reply that matches the request.
     """
@@ -354,9 +354,9 @@ async def coa(server_id: str, virtual_id: str, request: Request):
                     media_type="application/json")
 
 
-@application.post("/v1/lunar/{server_id}/log")
+@application.post("/v1/lunar/radius/{server_id}/log")
 async def remote_log(server_id: str, request: Request):
-    """POST /v1/lunar/{server_id}/log - remote log lines (accepted)."""
+    """POST /v1/lunar/radius/{server_id}/log - remote log lines (accepted)."""
     # lunar ships its subscriber log lines here as a JSON object; print
     # them in a readable form, then accept.
     body = await request.body()
@@ -394,9 +394,9 @@ async def remote_log(server_id: str, request: Request):
     return Response(status_code=201)
 
 
-@application.get("/v1/lunar/ping")
+@application.get("/v1/lunar/radius/ping")
 async def ping():
-    """GET /v1/lunar/ping - the health probe lunar's /v1/status hits."""
+    """GET /v1/lunar/radius/ping - the health probe lunar's /v1/status hits."""
     return Response(status_code=200)
 
 

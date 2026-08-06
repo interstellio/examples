@@ -15,13 +15,13 @@
 //
 // Endpoints (see docs/subscriber/radius/api.rst):
 //
-//	GET  /v1/lunar/{server_id}/virtuals            -> [ TEST virtual ]
-//	GET  /v1/lunar/{server_id}/virtual/{id}        -> TEST virtual
-//	POST /v1/lunar/{server_id}/auth/{virtual_id}   -> access-accept / reject
-//	POST /v1/lunar/{server_id}/acct/{virtual_id}   -> accounting-response
-//	POST /v1/lunar/{server_id}/coa/{virtual_id}    -> coa-ack / disconnect-ack
-//	POST /v1/lunar/{server_id}/log                 -> 201 (accept + log)
-//	GET  /v1/lunar/ping                            -> 200 (health probe)
+//	GET  /v1/lunar/radius/{server_id}/virtuals            -> [ TEST virtual ]
+//	GET  /v1/lunar/radius/{server_id}/virtual/{id}        -> TEST virtual
+//	POST /v1/lunar/radius/{server_id}/auth/{virtual_id}   -> access-accept / reject
+//	POST /v1/lunar/radius/{server_id}/acct/{virtual_id}   -> accounting-response
+//	POST /v1/lunar/radius/{server_id}/coa/{virtual_id}    -> coa-ack / disconnect-ack
+//	POST /v1/lunar/radius/{server_id}/log                 -> 201 (accept + log)
+//	GET  /v1/lunar/radius/ping                            -> 200 (health probe)
 //
 // Run it (from this directory) with "go run ." and it listens on
 // 127.0.0.1:5555. See README.rst for the full walk-through.
@@ -261,17 +261,17 @@ func logExchange(kind, serverID, virtualID, clientIP string, request, reply Pack
 	)
 }
 
-// handleVirtuals answers GET /v1/lunar/{server_id}/virtuals.
+// handleVirtuals answers GET /v1/lunar/radius/{server_id}/virtuals.
 func handleVirtuals(w http.ResponseWriter, _ *http.Request) {
 	writeJSON(w, []Virtual{testVirtual})
 }
 
-// handleVirtual answers GET /v1/lunar/{server_id}/virtual/{virtual_id}.
+// handleVirtual answers GET /v1/lunar/radius/{server_id}/virtual/{virtual_id}.
 func handleVirtual(w http.ResponseWriter, _ *http.Request) {
 	writeJSON(w, testVirtual)
 }
 
-// handleAuth answers POST /v1/lunar/{server_id}/auth/{virtual_id}, an
+// handleAuth answers POST /v1/lunar/radius/{server_id}/auth/{virtual_id}, an
 // Access-Request.
 //
 // Answering a request happens in four steps, numbered below: (1) read the
@@ -366,7 +366,7 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, reply)
 }
 
-// handleAcct answers POST /v1/lunar/{server_id}/acct/{virtual_id}, an
+// handleAcct answers POST /v1/lunar/radius/{server_id}/acct/{virtual_id}, an
 // Accounting-Request. lunar fast-ACKs accounting to the NAS itself, so we just
 // acknowledge it.
 func handleAcct(w http.ResponseWriter, r *http.Request) {
@@ -378,7 +378,7 @@ func handleAcct(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, reply)
 }
 
-// handleCoa answers POST /v1/lunar/{server_id}/coa/{virtual_id}, a CoA or
+// handleCoa answers POST /v1/lunar/radius/{server_id}/coa/{virtual_id}, a CoA or
 // Disconnect. Acknowledge with the reply that matches the request.
 func handleCoa(w http.ResponseWriter, r *http.Request) {
 	serverID := r.PathValue("server_id")
@@ -394,7 +394,7 @@ func handleCoa(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, reply)
 }
 
-// handleLog answers POST /v1/lunar/{server_id}/log, remote log lines (accepted).
+// handleLog answers POST /v1/lunar/radius/{server_id}/log, remote log lines (accepted).
 func handleLog(w http.ResponseWriter, r *http.Request) {
 	serverID := r.PathValue("server_id")
 
@@ -438,7 +438,7 @@ func handleLog(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-// handlePing answers GET /v1/lunar/ping, the health probe lunar's /v1/status
+// handlePing answers GET /v1/lunar/radius/ping, the health probe lunar's /v1/status
 // hits.
 func handlePing(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
@@ -460,13 +460,13 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /v1/lunar/{server_id}/virtuals", handleVirtuals)
-	mux.HandleFunc("GET /v1/lunar/{server_id}/virtual/{virtual_id}", handleVirtual)
-	mux.HandleFunc("POST /v1/lunar/{server_id}/auth/{virtual_id}", handleAuth)
-	mux.HandleFunc("POST /v1/lunar/{server_id}/acct/{virtual_id}", handleAcct)
-	mux.HandleFunc("POST /v1/lunar/{server_id}/coa/{virtual_id}", handleCoa)
-	mux.HandleFunc("POST /v1/lunar/{server_id}/log", handleLog)
-	mux.HandleFunc("GET /v1/lunar/ping", handlePing)
+	mux.HandleFunc("GET /v1/lunar/radius/{server_id}/virtuals", handleVirtuals)
+	mux.HandleFunc("GET /v1/lunar/radius/{server_id}/virtual/{virtual_id}", handleVirtual)
+	mux.HandleFunc("POST /v1/lunar/radius/{server_id}/auth/{virtual_id}", handleAuth)
+	mux.HandleFunc("POST /v1/lunar/radius/{server_id}/acct/{virtual_id}", handleAcct)
+	mux.HandleFunc("POST /v1/lunar/radius/{server_id}/coa/{virtual_id}", handleCoa)
+	mux.HandleFunc("POST /v1/lunar/radius/{server_id}/log", handleLog)
+	mux.HandleFunc("GET /v1/lunar/radius/ping", handlePing)
 
 	addr := "127.0.0.1:5555"
 

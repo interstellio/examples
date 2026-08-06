@@ -14,13 +14,13 @@
 //
 // Endpoints (see docs/subscriber/radius/api.rst):
 //
-//   GET  /v1/lunar/{server_id}/virtuals            -> [ TEST virtual ]
-//   GET  /v1/lunar/{server_id}/virtual/{id}        -> TEST virtual
-//   POST /v1/lunar/{server_id}/auth/{virtual_id}   -> access-accept / reject
-//   POST /v1/lunar/{server_id}/acct/{virtual_id}   -> accounting-response
-//   POST /v1/lunar/{server_id}/coa/{virtual_id}    -> coa-ack / disconnect-ack
-//   POST /v1/lunar/{server_id}/log                 -> 201 (accept + log)
-//   GET  /v1/lunar/ping                            -> 200 (health probe)
+//   GET  /v1/lunar/radius/{server_id}/virtuals            -> [ TEST virtual ]
+//   GET  /v1/lunar/radius/{server_id}/virtual/{id}        -> TEST virtual
+//   POST /v1/lunar/radius/{server_id}/auth/{virtual_id}   -> access-accept / reject
+//   POST /v1/lunar/radius/{server_id}/acct/{virtual_id}   -> accounting-response
+//   POST /v1/lunar/radius/{server_id}/coa/{virtual_id}    -> coa-ack / disconnect-ack
+//   POST /v1/lunar/radius/{server_id}/log                 -> 201 (accept + log)
+//   GET  /v1/lunar/radius/ping                            -> 200 (health probe)
 //
 // Run it (from this directory) with `dotnet run`; it listens on 127.0.0.1:5555.
 // Pass `--nodebug` to quiet the per-exchange logging. See README.rst for the
@@ -79,22 +79,22 @@ var app = builder.Build();
 
 // --- Configuration endpoints (what lunar fetches at start-up) --------------
 
-// GET /v1/lunar/{server_id}/virtuals - list virtuals for a server.
-app.MapGet("/v1/lunar/{serverId}/virtuals",
+// GET /v1/lunar/radius/{server_id}/virtuals - list virtuals for a server.
+app.MapGet("/v1/lunar/radius/{serverId}/virtuals",
     (string serverId) => Results.Text("[" + TestVirtualJson + "]", "application/json"));
 
-// GET /v1/lunar/{server_id}/virtual/{virtual_id} - one virtual by id.
-app.MapGet("/v1/lunar/{serverId}/virtual/{virtualId}",
+// GET /v1/lunar/radius/{server_id}/virtual/{virtual_id} - one virtual by id.
+app.MapGet("/v1/lunar/radius/{serverId}/virtual/{virtualId}",
     (string serverId, string virtualId) => Results.Text(TestVirtualJson, "application/json"));
 
 // --- Authentication ---------------------------------------------------------
 
-// POST /v1/lunar/{server_id}/auth/{virtual_id} - an Access-Request.
+// POST /v1/lunar/radius/{server_id}/auth/{virtual_id} - an Access-Request.
 //
 // Answering a request happens in four steps: (1) read the forwarded packet,
 // (2) find the user name, (3) detect the credential method and verify it to
 // build the reply, (4) answer lunar and log it.
-app.MapPost("/v1/lunar/{serverId}/auth/{virtualId}",
+app.MapPost("/v1/lunar/radius/{serverId}/auth/{virtualId}",
     async (string serverId, string virtualId, HttpRequest request) =>
 {
     // 1. Read the forwarded packet. lunar decodes the RADIUS packet off the
@@ -182,9 +182,9 @@ app.MapPost("/v1/lunar/{serverId}/auth/{virtualId}",
 
 // --- Accounting, CoA, log, health ------------------------------------------
 
-// POST /v1/lunar/{server_id}/acct/{virtual_id} - an Accounting-Request.
+// POST /v1/lunar/radius/{server_id}/acct/{virtual_id} - an Accounting-Request.
 // lunar fast-ACKs accounting to the NAS itself, so we just acknowledge it.
-app.MapPost("/v1/lunar/{serverId}/acct/{virtualId}",
+app.MapPost("/v1/lunar/radius/{serverId}/acct/{virtualId}",
     async (string serverId, string virtualId, HttpRequest request) =>
 {
     var packet = await ReadJson(request);
@@ -193,9 +193,9 @@ app.MapPost("/v1/lunar/{serverId}/acct/{virtualId}",
     return Results.Text(reply.ToJsonString(), "application/json");
 });
 
-// POST /v1/lunar/{server_id}/coa/{virtual_id} - CoA / Disconnect.
+// POST /v1/lunar/radius/{server_id}/coa/{virtual_id} - CoA / Disconnect.
 // Acknowledge with the reply that matches the request.
-app.MapPost("/v1/lunar/{serverId}/coa/{virtualId}",
+app.MapPost("/v1/lunar/radius/{serverId}/coa/{virtualId}",
     async (string serverId, string virtualId, HttpRequest request) =>
 {
     var packet = await ReadJson(request);
@@ -207,8 +207,8 @@ app.MapPost("/v1/lunar/{serverId}/coa/{virtualId}",
     return Results.Text(reply.ToJsonString(), "application/json");
 });
 
-// POST /v1/lunar/{server_id}/log - remote log lines (accepted).
-app.MapPost("/v1/lunar/{serverId}/log",
+// POST /v1/lunar/radius/{server_id}/log - remote log lines (accepted).
+app.MapPost("/v1/lunar/radius/{serverId}/log",
     async (string serverId, HttpRequest request) =>
 {
     var line = await ReadJson(request);
@@ -221,8 +221,8 @@ app.MapPost("/v1/lunar/{serverId}/log",
     return Results.StatusCode(201);
 });
 
-// GET /v1/lunar/ping - the health probe lunar's /v1/status hits.
-app.MapGet("/v1/lunar/ping", () => Results.StatusCode(200));
+// GET /v1/lunar/radius/ping - the health probe lunar's /v1/status hits.
+app.MapGet("/v1/lunar/radius/ping", () => Results.StatusCode(200));
 
 Console.WriteLine("RADIUS backend listening on http://127.0.0.1:5555");
 app.Run("http://127.0.0.1:5555");

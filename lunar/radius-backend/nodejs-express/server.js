@@ -14,13 +14,13 @@
 //
 // Endpoints (see docs/subscriber/radius/api.rst):
 //
-//   GET  /v1/lunar/{server_id}/virtuals            -> [ TEST virtual ]
-//   GET  /v1/lunar/{server_id}/virtual/{id}        -> TEST virtual
-//   POST /v1/lunar/{server_id}/auth/{virtual_id}   -> access-accept / reject
-//   POST /v1/lunar/{server_id}/acct/{virtual_id}   -> accounting-response
-//   POST /v1/lunar/{server_id}/coa/{virtual_id}    -> coa-ack / disconnect-ack
-//   POST /v1/lunar/{server_id}/log                 -> 201 (accept + log)
-//   GET  /v1/lunar/ping                            -> 200 (health probe)
+//   GET  /v1/lunar/radius/{server_id}/virtuals            -> [ TEST virtual ]
+//   GET  /v1/lunar/radius/{server_id}/virtual/{id}        -> TEST virtual
+//   POST /v1/lunar/radius/{server_id}/auth/{virtual_id}   -> access-accept / reject
+//   POST /v1/lunar/radius/{server_id}/acct/{virtual_id}   -> accounting-response
+//   POST /v1/lunar/radius/{server_id}/coa/{virtual_id}    -> coa-ack / disconnect-ack
+//   POST /v1/lunar/radius/{server_id}/log                 -> 201 (accept + log)
+//   GET  /v1/lunar/radius/ping                            -> 200 (health probe)
 //
 // Run it (from this directory) with `npm start` (or `node server.js`); it listens
 // on 127.0.0.1:5555. Pass `--nodebug` to quiet the per-exchange logging. See
@@ -82,24 +82,24 @@ app.use(express.text({ type: "*/*", limit: "1mb" }));
 
 // --- Configuration endpoints (what lunar fetches at start-up) --------------
 
-// GET /v1/lunar/{server_id}/virtuals - list virtuals for a server.
-app.get("/v1/lunar/:serverId/virtuals", (req, res) => {
+// GET /v1/lunar/radius/{server_id}/virtuals - list virtuals for a server.
+app.get("/v1/lunar/radius/:serverId/virtuals", (req, res) => {
   res.json([TEST_VIRTUAL]);
 });
 
-// GET /v1/lunar/{server_id}/virtual/{virtual_id} - one virtual by id.
-app.get("/v1/lunar/:serverId/virtual/:virtualId", (req, res) => {
+// GET /v1/lunar/radius/{server_id}/virtual/{virtual_id} - one virtual by id.
+app.get("/v1/lunar/radius/:serverId/virtual/:virtualId", (req, res) => {
   res.json(TEST_VIRTUAL);
 });
 
 // --- Authentication ---------------------------------------------------------
 
-// POST /v1/lunar/{server_id}/auth/{virtual_id} - an Access-Request.
+// POST /v1/lunar/radius/{server_id}/auth/{virtual_id} - an Access-Request.
 //
 // Answering a request happens in four steps: (1) read the forwarded packet,
 // (2) find the user name, (3) detect the credential method and verify it to
 // build the reply, (4) answer lunar and log it.
-app.post("/v1/lunar/:serverId/auth/:virtualId", (req, res) => {
+app.post("/v1/lunar/radius/:serverId/auth/:virtualId", (req, res) => {
   // 1. Read the forwarded packet. lunar decodes the RADIUS packet off the wire
   //    and POSTs it to us as JSON. Bad or empty JSON becomes a reject here,
   //    never a 500.
@@ -171,18 +171,18 @@ app.post("/v1/lunar/:serverId/auth/:virtualId", (req, res) => {
 
 // --- Accounting, CoA, log, health ------------------------------------------
 
-// POST /v1/lunar/{server_id}/acct/{virtual_id} - an Accounting-Request.
+// POST /v1/lunar/radius/{server_id}/acct/{virtual_id} - an Accounting-Request.
 // lunar fast-ACKs accounting to the NAS itself, so we just acknowledge it.
-app.post("/v1/lunar/:serverId/acct/:virtualId", (req, res) => {
+app.post("/v1/lunar/radius/:serverId/acct/:virtualId", (req, res) => {
   const packet = readJson(req);
   const reply = { code: "accounting-response", attributes: {} };
   logExchange("acct", req.params.serverId, req.params.virtualId, req.get("x-client-ip"), packet, reply);
   res.json(reply);
 });
 
-// POST /v1/lunar/{server_id}/coa/{virtual_id} - CoA / Disconnect.
+// POST /v1/lunar/radius/{server_id}/coa/{virtual_id} - CoA / Disconnect.
 // Acknowledge with the reply that matches the request.
-app.post("/v1/lunar/:serverId/coa/:virtualId", (req, res) => {
+app.post("/v1/lunar/radius/:serverId/coa/:virtualId", (req, res) => {
   const packet = readJson(req);
   const code = packet.code === "disconnect-request" ? "disconnect-ack" : "coa-ack";
   const reply = { code, attributes: {} };
@@ -190,8 +190,8 @@ app.post("/v1/lunar/:serverId/coa/:virtualId", (req, res) => {
   res.json(reply);
 });
 
-// POST /v1/lunar/{server_id}/log - remote log lines (accepted).
-app.post("/v1/lunar/:serverId/log", (req, res) => {
+// POST /v1/lunar/radius/{server_id}/log - remote log lines (accepted).
+app.post("/v1/lunar/radius/:serverId/log", (req, res) => {
   const line = readJson(req);
   if (debug) {
     const level = (line.level || "info").toUpperCase();
@@ -201,8 +201,8 @@ app.post("/v1/lunar/:serverId/log", (req, res) => {
   res.sendStatus(201);
 });
 
-// GET /v1/lunar/ping - the health probe lunar's /v1/status hits.
-app.get("/v1/lunar/ping", (req, res) => {
+// GET /v1/lunar/radius/ping - the health probe lunar's /v1/status hits.
+app.get("/v1/lunar/radius/ping", (req, res) => {
   res.sendStatus(200);
 });
 

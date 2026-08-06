@@ -15,13 +15,13 @@ Accounting and CoA are acknowledged; the log and health endpoints are accepted.
 
 Endpoints (see ``docs/subscriber/radius/api.rst``):
 
-    GET  /v1/lunar/{server_id}/virtuals            -> [ TEST virtual ]
-    GET  /v1/lunar/{server_id}/virtual/{id}        -> TEST virtual
-    POST /v1/lunar/{server_id}/auth/{virtual_id}   -> access-accept / reject
-    POST /v1/lunar/{server_id}/acct/{virtual_id}   -> accounting-response
-    POST /v1/lunar/{server_id}/coa/{virtual_id}    -> coa-ack / disconnect-ack
-    POST /v1/lunar/{server_id}/log                 -> 201 (accept + log)
-    GET  /v1/lunar/ping                            -> 200 (health probe)
+    GET  /v1/lunar/radius/{server_id}/virtuals          -> [ TEST virtual ]
+    GET  /v1/lunar/radius/{server_id}/virtual/{id}      -> TEST virtual
+    POST /v1/lunar/radius/{server_id}/auth/{virtual_id} -> accept / reject
+    POST /v1/lunar/radius/{server_id}/acct/{virtual_id} -> accounting-response
+    POST /v1/lunar/radius/{server_id}/coa/{virtual_id}  -> coa/disconnect-ack
+    POST /v1/lunar/radius/{server_id}/log               -> 201 (accept + log)
+    GET  /v1/lunar/radius/ping                          -> 200 (health probe)
 
 Run it (from this directory) with ``python app.py`` and it listens on
 127.0.0.1:5555. See README.rst for the full walk-through.
@@ -120,21 +120,21 @@ def log_exchange(kind, server_id, virtual_id, client_ip, request, reply):
 
 
 class VirtualsResource:
-    """GET /v1/lunar/{server_id}/virtuals - list virtuals for a server."""
+    """GET /v1/lunar/radius/{server_id}/virtuals - virtuals for a server."""
 
     async def on_get(self, req, resp, server_id):
         resp.text = json.dumps([TEST_VIRTUAL])
 
 
 class VirtualResource:
-    """GET /v1/lunar/{server_id}/virtual/{virtual_id} - one virtual by id."""
+    """GET /v1/lunar/radius/{server_id}/virtual/{virtual_id} - one virtual."""
 
     async def on_get(self, req, resp, server_id, virtual_id):
         resp.text = json.dumps(TEST_VIRTUAL)
 
 
 class AuthResource:
-    """POST /v1/lunar/{server_id}/auth/{virtual_id} - an Access-Request.
+    """POST /v1/lunar/radius/{server_id}/auth/{virtual_id} - an Access-Request.
 
     Answering a request happens in four steps, numbered in ``on_post`` below:
     (1) read the forwarded packet, (2) find the user name, (3) detect the
@@ -314,7 +314,7 @@ class AuthResource:
 
 
 class AcctResource:
-    """POST /v1/lunar/{server_id}/acct/{virtual_id} - an Accounting-Request.
+    """POST /v1/lunar/radius/{server_id}/acct/{virtual_id} - an acct request.
 
     lunar fast-ACKs accounting to the NAS itself, so we just acknowledge it.
     """
@@ -331,7 +331,7 @@ class AcctResource:
 
 
 class CoaResource:
-    """POST /v1/lunar/{server_id}/coa/{virtual_id} - CoA / Disconnect.
+    """POST /v1/lunar/radius/{server_id}/coa/{virtual_id} - CoA / Disconnect.
 
     Acknowledge with the reply that matches the request.
     """
@@ -352,7 +352,7 @@ class CoaResource:
 
 
 class LogResource:
-    """POST /v1/lunar/{server_id}/log - remote log lines (accepted)."""
+    """POST /v1/lunar/radius/{server_id}/log - remote log lines (accepted)."""
 
     async def on_post(self, req, resp, server_id):
         # lunar ships its subscriber log lines here as a JSON object; print
@@ -393,7 +393,7 @@ class LogResource:
 
 
 class PingResource:
-    """GET /v1/lunar/ping - the health probe lunar's /v1/status hits."""
+    """GET /v1/lunar/radius/ping - the health probe lunar's /v1/status hits."""
 
     async def on_get(self, req, resp):
         resp.status = falcon.HTTP_200
@@ -403,17 +403,17 @@ def create_app():
     """Build and return the Falcon ASGI application."""
     application = falcon.asgi.App()
     application.add_route(
-        "/v1/lunar/{server_id}/virtuals", VirtualsResource())
+        "/v1/lunar/radius/{server_id}/virtuals", VirtualsResource())
     application.add_route(
-        "/v1/lunar/{server_id}/virtual/{virtual_id}", VirtualResource())
+        "/v1/lunar/radius/{server_id}/virtual/{virtual_id}", VirtualResource())
     application.add_route(
-        "/v1/lunar/{server_id}/auth/{virtual_id}", AuthResource())
+        "/v1/lunar/radius/{server_id}/auth/{virtual_id}", AuthResource())
     application.add_route(
-        "/v1/lunar/{server_id}/acct/{virtual_id}", AcctResource())
+        "/v1/lunar/radius/{server_id}/acct/{virtual_id}", AcctResource())
     application.add_route(
-        "/v1/lunar/{server_id}/coa/{virtual_id}", CoaResource())
-    application.add_route("/v1/lunar/{server_id}/log", LogResource())
-    application.add_route("/v1/lunar/ping", PingResource())
+        "/v1/lunar/radius/{server_id}/coa/{virtual_id}", CoaResource())
+    application.add_route("/v1/lunar/radius/{server_id}/log", LogResource())
+    application.add_route("/v1/lunar/radius/ping", PingResource())
     return application
 
 

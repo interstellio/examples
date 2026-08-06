@@ -250,7 +250,7 @@ You can also hit the backend directly with ``curl``:
 
 .. code:: bash
 
-    curl -s http://127.0.0.1:5555/v1/lunar/s1/auth/TEST \
+    curl -s http://127.0.0.1:5555/v1/lunar/radius/s1/auth/TEST \
         -d '{"attributes":{"User-Name":{"values":["test"]},
              "User-Password":{"values":["test"]}}}'
 
@@ -264,21 +264,21 @@ Endpoints
 
 The backend implements the lunar backend API:
 
-+----------------------------------------------+--------+---------------------------+
-| Path                                         | Method | Purpose                   |
-+==============================================+========+===========================+
-| /v1/lunar/{server_id}/virtuals               | GET    | List virtuals (the TEST   |
-|                                              |        | virtual).                 |
-+----------------------------------------------+--------+---------------------------+
-| /v1/lunar/{server_id}/virtual/{id}           | GET    | One virtual by id.        |
-+----------------------------------------------+--------+---------------------------+
-| /v1/lunar/{server_id}/{type}/{virtual_id}    | POST   | An inbound packet;        |
-|                                              |        | type is auth/acct/coa.    |
-+----------------------------------------------+--------+---------------------------+
-| /v1/lunar/{server_id}/log                    | POST   | Remote log line (201).    |
-+----------------------------------------------+--------+---------------------------+
-| /v1/lunar/ping                               | GET    | Health probe (200).       |
-+----------------------------------------------+--------+---------------------------+
++-----------------------------------------------------+--------+---------------------------+
+| Path                                                | Method | Purpose                   |
++=====================================================+========+===========================+
+| /v1/lunar/radius/{server_id}/virtuals               | GET    | List virtuals (the TEST   |
+|                                                     |        | virtual).                 |
++-----------------------------------------------------+--------+---------------------------+
+| /v1/lunar/radius/{server_id}/virtual/{id}           | GET    | One virtual by id.        |
++-----------------------------------------------------+--------+---------------------------+
+| /v1/lunar/radius/{server_id}/{type}/{virtual_id}    | POST   | An inbound packet;        |
+|                                                     |        | type is auth/acct/coa.    |
++-----------------------------------------------------+--------+---------------------------+
+| /v1/lunar/radius/{server_id}/log                    | POST   | Remote log line (201).    |
++-----------------------------------------------------+--------+---------------------------+
+| /v1/lunar/radius/ping                               | GET    | Health probe (200).       |
++-----------------------------------------------------+--------+---------------------------+
 
 It speaks JSON, the default lunar encoding.
 

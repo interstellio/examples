@@ -101,20 +101,20 @@ function log_exchange(string $kind, string $server_id, string $virtual_id, ?stri
     ));
 }
 
-/** GET /v1/lunar/ping - the health probe lunar's /v1/status hits. */
+/** GET /v1/lunar/radius/ping - the health probe lunar's /v1/status hits. */
 function ping(array $params): void
 {
     http_response_code(200);
 }
 
-/** GET /v1/lunar/{server_id}/virtuals - list virtuals for a server. */
+/** GET /v1/lunar/radius/{server_id}/virtuals - list virtuals for a server. */
 function virtuals(array $params): void
 {
     header('Content-Type: application/json');
     echo json_encode([TEST_VIRTUAL]);
 }
 
-/** GET /v1/lunar/{server_id}/virtual/{virtual_id} - one virtual by id. */
+/** GET /v1/lunar/radius/{server_id}/virtual/{virtual_id} - one virtual by id. */
 function virtual(array $params): void
 {
     header('Content-Type: application/json');
@@ -122,7 +122,7 @@ function virtual(array $params): void
 }
 
 /**
- * POST /v1/lunar/{server_id}/auth/{virtual_id} - an Access-Request.
+ * POST /v1/lunar/radius/{server_id}/auth/{virtual_id} - an Access-Request.
  *
  * Answering a request happens in four steps, numbered below: (1) read the
  * forwarded packet, (2) find the user name, (3) detect the credential method
@@ -297,7 +297,7 @@ function auth(array $params): void
 }
 
 /**
- * POST /v1/lunar/{server_id}/acct/{virtual_id} - an Accounting-Request.
+ * POST /v1/lunar/radius/{server_id}/acct/{virtual_id} - an Accounting-Request.
  *
  * lunar fast-ACKs accounting to the NAS itself, so we just acknowledge it.
  */
@@ -311,7 +311,7 @@ function acct(array $params): void
 }
 
 /**
- * POST /v1/lunar/{server_id}/coa/{virtual_id} - CoA / Disconnect.
+ * POST /v1/lunar/radius/{server_id}/coa/{virtual_id} - CoA / Disconnect.
  *
  * Acknowledge with the reply that matches the request.
  */
@@ -328,7 +328,7 @@ function coa(array $params): void
     echo json_encode($reply);
 }
 
-/** POST /v1/lunar/{server_id}/log - remote log lines (accepted). */
+/** POST /v1/lunar/radius/{server_id}/log - remote log lines (accepted). */
 function remote_log(array $params): void
 {
     // lunar ships its subscriber log lines here as a JSON object; print them
@@ -353,13 +353,13 @@ function remote_log(array $params): void
 
 // The routes lunar calls: [method, path regex with named params, handler].
 $routes = [
-    ['GET',  '#^/v1/lunar/ping$#', 'ping'],
-    ['GET',  '#^/v1/lunar/(?P<server_id>[^/]+)/virtuals$#', 'virtuals'],
-    ['GET',  '#^/v1/lunar/(?P<server_id>[^/]+)/virtual/(?P<virtual_id>[^/]+)$#', 'virtual'],
-    ['POST', '#^/v1/lunar/(?P<server_id>[^/]+)/auth/(?P<virtual_id>[^/]+)$#', 'auth'],
-    ['POST', '#^/v1/lunar/(?P<server_id>[^/]+)/acct/(?P<virtual_id>[^/]+)$#', 'acct'],
-    ['POST', '#^/v1/lunar/(?P<server_id>[^/]+)/coa/(?P<virtual_id>[^/]+)$#', 'coa'],
-    ['POST', '#^/v1/lunar/(?P<server_id>[^/]+)/log$#', 'remote_log'],
+    ['GET',  '#^/v1/lunar/radius/ping$#', 'ping'],
+    ['GET',  '#^/v1/lunar/radius/(?P<server_id>[^/]+)/virtuals$#', 'virtuals'],
+    ['GET',  '#^/v1/lunar/radius/(?P<server_id>[^/]+)/virtual/(?P<virtual_id>[^/]+)$#', 'virtual'],
+    ['POST', '#^/v1/lunar/radius/(?P<server_id>[^/]+)/auth/(?P<virtual_id>[^/]+)$#', 'auth'],
+    ['POST', '#^/v1/lunar/radius/(?P<server_id>[^/]+)/acct/(?P<virtual_id>[^/]+)$#', 'acct'],
+    ['POST', '#^/v1/lunar/radius/(?P<server_id>[^/]+)/coa/(?P<virtual_id>[^/]+)$#', 'coa'],
+    ['POST', '#^/v1/lunar/radius/(?P<server_id>[^/]+)/log$#', 'remote_log'],
 ];
 
 $method = $_SERVER['REQUEST_METHOD'];
