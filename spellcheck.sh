@@ -24,5 +24,14 @@ fi
 SKIP="*.min.js,*.min.css,*.map,*.json,*.lock,*.svg,*.png,*.jpg,*.jpeg,*.gif"
 SKIP="$SKIP,*.ico,*.woff,*.woff2,*.ttf,*.eot,.git,node_modules,build,dist"
 SKIP="$SKIP,.next,out,coverage,*.snap,*.egg-info,external,__pycache__,.venv"
+SKIP="$SKIP,build.log,*.log,*.pdf"
 
-exec "$CODESPELL" --skip="$SKIP" "$PROJECT_DIR"
+# Real acronyms, product/customer names and config directives that codespell
+# mistakes for typos. Correcting these would corrupt the docs.
+IGNORE="olt,odn,coo,fastr,nd,noo,te,zar,toi,ist,fo,nam,nome,signalling"
+
+# Enforce US spelling: the en-GB_to_en-US dictionary flags British spellings
+# (such as the -ise / -our variants) which codespell's default accepts.
+BUILTIN="clear,rare,en-GB_to_en-US"
+
+exec "$CODESPELL" --builtin="$BUILTIN" --skip="$SKIP" --ignore-words-list="$IGNORE" "$PROJECT_DIR"
